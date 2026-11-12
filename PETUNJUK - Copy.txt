@@ -1,0 +1,14 @@
+CARGOTRACE AUTH PAGE VISUAL REFINEMENT
+
+This patch only replaces:
+- resources/views/auth/login.blade.php
+- resources/views/auth/register.blade.php
+- public/images/cargotrace-auth-illustration.png
+
+Install:
+1. Extract this ZIP.
+2. Copy resources and public folders into C:\laragon\www\CargoTrace-Complete and choose Replace.
+3. Run: php artisan optimize:clear
+4. Refresh /login (Ctrl+F5).
+
+This patch does not replace routes/web.php or AuthController.php; keep the working register routes and controller already installed.

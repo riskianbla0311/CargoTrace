@@ -1,0 +1,20 @@
+CARGOTRACE - INSTALLASI LARAGON
+
+1. Ekstrak folder CargoTrace-Complete ke C:\laragon\www\CargoTrace-Complete
+2. Buka Laragon, klik Start All.
+3. Buat database MySQL bernama cargotrace.
+4. Buka Terminal Laragon, jalankan:
+   cd C:\laragon\www\CargoTrace-Complete
+   copy .env.example .env
+   composer install
+   php artisan key:generate
+   php artisan migrate --seed
+   php artisan serve
+5. Buka http://127.0.0.1:8000
+
+Login demo:
+admin@cargotrace.test / password
+operator@cargotrace.test / password
+customer@cargotrace.test / password
+
+Jangan upload file .env ke GitHub. Ganti password demo sebelum deployment.

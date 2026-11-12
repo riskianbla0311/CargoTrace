@@ -1,0 +1,7 @@
+<?php
+use Illuminate\Database\Migrations\Migration;use Illuminate\Database\Schema\Blueprint;use Illuminate\Support\Facades\Schema;
+return new class extends Migration {public function up():void{
+Schema::create('shipment_exceptions',function(Blueprint $t){$t->id();$t->foreignId('shipment_id')->constrained()->cascadeOnDelete();$t->string('type',60);$t->string('severity',20);$t->string('status',30)->default('OPEN')->index();$t->text('description');$t->dateTime('detected_at');$t->dateTime('resolved_at')->nullable();$t->foreignId('created_by')->constrained('users')->restrictOnDelete();$t->timestamps();$t->index(['shipment_id','status']);});
+Schema::create('notifications',function(Blueprint $t){$t->id();$t->foreignId('user_id')->constrained()->cascadeOnDelete();$t->string('title',160);$t->text('message');$t->string('type',50)->default('info');$t->dateTime('read_at')->nullable();$t->json('data')->nullable();$t->timestamps();$t->index(['user_id','read_at']);});
+Schema::create('audit_logs',function(Blueprint $t){$t->id();$t->foreignId('user_id')->nullable()->constrained()->nullOnDelete();$t->string('action',100);$t->string('entity_type',180);$t->unsignedBigInteger('entity_id')->nullable();$t->json('details')->nullable();$t->timestamp('created_at')->useCurrent();$t->index(['entity_type','entity_id']);$t->index('created_at');});
+}public function down():void{Schema::dropIfExists('audit_logs');Schema::dropIfExists('notifications');Schema::dropIfExists('shipment_exceptions');}};

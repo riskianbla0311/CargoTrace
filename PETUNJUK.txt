@@ -1,0 +1,26 @@
+CARGOTRACE - SHIPMENTS & CARRIERS UI UPDATE
+
+Mengikuti dua referensi screenshot yang diberikan:
+- Shipments: KPI cards, search/filter toolbar, status tabs, shipment table, pagination.
+- Carriers: KPI cards, search, partner cards/grid, active badge, shipment/delivery metrics, contact info, add carrier form.
+
+File:
+- resources/views/shipments/index.blade.php
+- resources/views/admin/carriers.blade.php
+- app/Http/Controllers/ShipmentController.php
+- app/Http/Controllers/AdminController.php
+
+Pasang:
+1. Backup 4 file lama.
+2. Extract ZIP.
+3. Merge folder app dan resources ke C:\laragon\www\CargoTrace-Complete (Replace).
+4. Jalankan:
+   php artisan optimize:clear
+5. Buka /shipments dan /admin/carriers.
+
+Tidak ada migration/database reset.
+Catatan:
+- KPI shipment mengikuti role. Customer hanya melihat data shipment miliknya.
+- Carrier metrics dihitung dari data yang ada; bukan angka contoh dari screenshot.
+- Add Carrier tetap memakai route admin.carriers.store yang sudah ada.
+- Tampilan menggunakan layout app.blade.php dan class btn/panel/field dari proyek.
