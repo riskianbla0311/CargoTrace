@@ -40,6 +40,9 @@ table{width:100%;border-collapse:collapse;font-size:12px}th{text-align:left;colo
 <a class="{{ request()->routeIs('dashboard')?'active':'' }}" href="{{ route('dashboard') }}"><span class="navicon">▦</span>Overview</a>
 <a class="{{ request()->routeIs('shipments.*')?'active':'' }}" href="{{ route('shipments.index') }}"><span class="navicon">▤</span>{{ auth()->user()->role === 'customer' ? 'My Shipments' : 'Shipments' }}</a>
 @if(in_array(auth()->user()->role,['admin','operator']))
+<a class="{{ request()->routeIs('shipments.archived')?'active':'' }}" href="{{ route('shipments.archived') }}"><span class="navicon">▣</span>Archived Shipments</a>
+@endif
+@if(in_array(auth()->user()->role,['admin','operator']))
 <div class="navlabel">OPERATIONS</div>
 <a class="{{ request()->routeIs('shipments.create')?'active':'' }}" href="{{ route('shipments.create') }}"><span class="navicon">＋</span>Create shipment</a>
 @endif
@@ -53,6 +56,12 @@ table{width:100%;border-collapse:collapse;font-size:12px}th{text-align:left;colo
 @if(in_array(auth()->user()->role,['admin','operator']))
 <div class="navlabel">MONITORING</div>
 <a class="{{ request()->routeIs('exceptions.*')?'active':'' }}" href="{{ route('exceptions.index') }}"><span class="navicon">⚠</span>Exceptions</a>
+@endif
+<div class="navlabel">MONITORING</div>
+<a class="{{ request()->routeIs('tracking.*')?'active':'' }}" href="{{ route('tracking.index') }}"><span class="navicon">◉</span>Tracking</a>
+@if(in_array(auth()->user()->role,['admin','operator']))
+<div class="navlabel">ANALYTICS</div>
+<a class="{{ request()->routeIs('reports.*')?'active':'' }}" href="{{ route('reports.index') }}"><span class="navicon">▤</span>Reports</a>
 @endif
 <div class="navlabel">ACCOUNT</div>
 <a class="{{ request()->routeIs('notifications.*')?'active':'' }}" href="{{ route('notifications.index') }}"><span class="navicon">♧</span>Notifications</a>

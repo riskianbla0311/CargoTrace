@@ -7,6 +7,7 @@ use App\Models\Carrier;
 use App\Models\Location;
 use App\Models\AuditLog;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash;
 
 class AdminController extends Controller
 {
@@ -134,7 +135,9 @@ class AdminController extends Controller
     public function locations()
     {
         $locations = Location::latest()->paginate(20);
-        return view('admin.locations', compact('locations'));
+        $activeLocationCount = Location::where('is_active', true)->count();
+        $inactiveLocationCount = Location::where('is_active', false)->count();
+        return view('admin.locations', compact('locations', 'activeLocationCount', 'inactiveLocationCount'));
     }
 
     public function updateLocation(Request $request, Location $location)
@@ -147,6 +150,7 @@ class AdminController extends Controller
             'latitude' => 'nullable|numeric|between:-90,90',
             'longitude' => 'nullable|numeric|between:-180,180',
             'location_type' => 'nullable|string|max:50',
+            'is_active' => 'sometimes|boolean',
         ]);
         $location->update($data);
         AuditLog::create(['user_id' => $request->user()->id, 'action' => 'location.updated', 'entity_type' => Location::class, 'entity_id' => $location->id, 'details' => $data, 'created_at' => now()]);
@@ -165,9 +169,24 @@ class AdminController extends Controller
             'location_type' => 'nullable|string|max:50',
         ]);
 
-        $location = Location::create($data);
+        $location = Location::create($data + ['is_active' => true]);
         AuditLog::create(['user_id' => $request->user()->id, 'action' => 'location.created', 'entity_type' => Location::class, 'entity_id' => $location->id, 'details' => ['name' => $location->name], 'created_at' => now()]);
         return back()->with('success', 'Lokasi ditambahkan.');
+    }
+
+
+    public function toggleLocationStatus(Request $request, Location $location)
+    {
+        $location->update(['is_active' => ! $location->is_active]);
+        AuditLog::create([
+            'user_id' => $request->user()->id,
+            'action' => $location->is_active ? 'location.activated' : 'location.deactivated',
+            'entity_type' => Location::class,
+            'entity_id' => $location->id,
+            'details' => ['name' => $location->name, 'is_active' => $location->is_active],
+            'created_at' => now(),
+        ]);
+        return back()->with('success', $location->is_active ? 'Lokasi diaktifkan kembali.' : 'Lokasi berhasil dinonaktifkan.');
     }
 
     public function audit()

@@ -1,5 +1,7 @@
 <?php
 namespace App\Services;
+
+use App\Models\Notification;
 use App\Enums\ShipmentStatus;
 use App\Models\AuditLog;
 use App\Models\Shipment;

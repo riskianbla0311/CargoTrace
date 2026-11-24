@@ -3,6 +3,7 @@ namespace App\Services;
 use App\Enums\ShipmentStatus;
 use App\Models\AuditLog;
 use App\Models\Shipment;
+use App\Models\Notification;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
 class ShipmentService {

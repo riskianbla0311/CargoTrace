@@ -13,6 +13,11 @@
     @method('PUT')
     <div class="formgrid">
         <div class="field"><label>Shipment number</label><input name="shipment_number" value="{{ old('shipment_number', $shipment->shipment_number) }}" required></div>
+        <div class="field"><label>Shipment Type</label><select name="shipment_type" required><option value="DOMESTIC" @selected(old('shipment_type', $shipment->shipment_type ?? 'DOMESTIC')==='DOMESTIC')>Domestic</option><option value="INTERNATIONAL" @selected(old('shipment_type', $shipment->shipment_type ?? '')==='INTERNATIONAL')>International</option></select></div>
+        <div class="field"><label>HS Code</label><input name="hs_code" value="{{ old('hs_code', $shipment->hs_code) }}" maxlength="30"></div>
+        <div class="field"><label>Incoterms</label><select name="incoterms"><option value="">Not specified</option>@foreach(['EXW','FCA','CPT','CIP','DAP','DPU','DDP','FAS','FOB','CFR','CIF'] as $term)<option value="{{ $term }}" @selected(old('incoterms', $shipment->incoterms)===$term)>{{ $term }}</option>@endforeach</select></div>
+        <div class="field"><label>Customs Status</label><select name="customs_status"><option value="">Not specified</option>@foreach(['PENDING','IN_REVIEW','CLEARED','HELD','NOT_REQUIRED'] as $state)<option value="{{ $state }}" @selected(old('customs_status', $shipment->customs_status)===$state)>{{ str_replace('_',' ',$state) }}</option>@endforeach</select></div>
+        <div class="field"><label>Customs Reference</label><input name="customs_reference" value="{{ old('customs_reference', $shipment->customs_reference) }}"></div>
         <div class="field"><label>Customer</label><select name="customer_id" required>@foreach($customers as $customer)<option value="{{ $customer->id }}" @selected(old('customer_id', $shipment->customer_id)==$customer->id)>{{ $customer->name }} · {{ $customer->email }}</option>@endforeach</select></div>
         <div class="field"><label>Carrier</label><select name="carrier_id" required>@foreach($carriers as $carrier)<option value="{{ $carrier->id }}" @selected(old('carrier_id', $shipment->carrier_id)==$carrier->id)>{{ $carrier->name }}</option>@endforeach</select></div>
         <div class="field"><label>Cargo type</label><input name="cargo_type" value="{{ old('cargo_type', $shipment->cargo_type) }}" required></div>

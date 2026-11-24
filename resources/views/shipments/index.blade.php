@@ -623,9 +623,13 @@
                             </td>
 
                             <td>
-                                <a class="ship-action" href="{{ route('shipments.show', $shipment) }}">
-                                    Details →
-                                </a>
+                                <a class="ship-action" href="{{ route('shipments.show', $shipment) }}">Details →</a>
+                                @if(in_array(auth()->user()->role, ['admin', 'operator'], true))
+                                    <form method="POST" action="{{ route('shipments.archive', $shipment) }}" style="display:inline-block;margin-left:10px" onsubmit="return confirm('Arsipkan shipment ini? Data tidak akan dihapus permanen.');">
+                                        @csrf @method('PATCH')
+                                        <button type="submit" class="ship-action" style="border:0;background:transparent;color:#b96b2c;cursor:pointer">Archive</button>
+                                    </form>
+                                @endif
                             </td>
                         </tr>
 

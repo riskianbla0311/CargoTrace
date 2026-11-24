@@ -76,7 +76,8 @@
                     <th>City</th>
                     <th>Country</th>
                     <th>Coordinates</th>
-                    <th>Update</th>
+                    <th>Status</th>
+                    <th>Actions</th>
                 </tr>
             </thead>
 
@@ -87,6 +88,7 @@
                         <td>{{ $location->city }}</td>
                         <td>{{ $location->country }}</td>
                         <td>{{ $location->latitude }}, {{ $location->longitude }}</td>
+                        <td>{{ $location->is_active ? 'Active' : 'Inactive' }}</td>
                         <td>
                             <details><summary style="cursor:pointer;color:#2864e8">Edit</summary>
                                 <form method="POST" action="{{ route('admin.locations.update',$location) }}" style="min-width:230px;display:grid;gap:6px;margin-top:8px">
@@ -101,11 +103,15 @@
                                     <button class="btn secondary">Save changes</button>
                                 </form>
                             </details>
+                            <form method="POST" action="{{ route('admin.locations.toggle-status', $location) }}" style="margin-top:8px">
+                                @csrf @method('PATCH')
+                                <button class="btn secondary" type="submit">{{ $location->is_active ? 'Nonaktifkan' : 'Aktifkan kembali' }}</button>
+                            </form>
                         </td>
                     </tr>
                 @empty
                     <tr>
-                        <td colspan="5">No locations available.</td>
+                        <td colspan="6">No locations available.</td>
                     </tr>
                 @endforelse
             </tbody>

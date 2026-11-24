@@ -515,6 +515,10 @@ body {
 
             </div>
 
+            @if (session('status'))
+                <div class="auth-alert">{{ session('status') }}</div>
+            @endif
+
             @if ($errors->any())
                 <div class="auth-alert">
                     {{ $errors->first() }}
@@ -581,7 +585,7 @@ body {
             </div>
 
             <div class="auth-forgot">
-                Forgot password?
+                <a href="{{ route('password.request') }}">Forgot password?</a>
             </div>
 
             <button class="auth-submit" type="submit">

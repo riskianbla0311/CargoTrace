@@ -91,6 +91,70 @@ class DashboardController extends Controller
             return is_numeric($point['lat']) && is_numeric($point['lng']);
         })->values();
 
+        // Ringkasan multimodal dan internasional untuk dashboard (mengikuti cakupan role).
+        $legShipments = (clone $query)
+            ->with(['legs.origin', 'legs.destination', 'legs.carrier', 'trackingEvents.location'])
+            ->whereHas('legs')
+            ->latest()
+            ->get();
+
+        $multimodalShipments = $legShipments->filter(function ($shipment) {
+            return $shipment->legs->pluck('transport_mode')->filter()->unique()->count() > 1;
+        });
+        $internationalCount = (clone $query)->where('shipment_type', 'INTERNATIONAL')->count();
+        $multimodalCount = $multimodalShipments->count();
+
+$modeCounts = collect([
+    'LAND' => 0,
+    'SEA' => 0,
+    'AIR' => 0,
+]);
+
+foreach ($legShipments as $shipment) {
+    foreach ($shipment->legs as $leg) {
+        $mode = strtoupper((string) $leg->transport_mode);
+
+        if ($modeCounts->has($mode)) {
+            $modeCounts->put(
+                $mode,
+                $modeCounts->get($mode) + 1
+            );
+        }
+    }
+}
+
+        $multimodalSegments = $legShipments->flatMap(function ($shipment) {
+            return $shipment->legs->map(function ($leg) use ($shipment) {
+                return [
+                    'shipment' => $shipment->shipment_number,
+                    'mode' => strtoupper((string) $leg->transport_mode),
+                    'status' => strtoupper((string) ($leg->status ?? 'PLANNED')),
+                    'origin' => $leg->origin?->city ?? $leg->origin?->name ?? 'Origin',
+                    'destination' => $leg->destination?->city ?? $leg->destination?->name ?? 'Destination',
+                    'originLat' => $leg->origin?->latitude,
+                    'originLng' => $leg->origin?->longitude,
+                    'destinationLat' => $leg->destination?->latitude,
+                    'destinationLng' => $leg->destination?->longitude,
+                    'departure' => $leg->actual_departure_at?->toIso8601String() ?? $leg->expected_departure_at?->toIso8601String(),
+                    'arrival' => $leg->actual_arrival_at?->toIso8601String() ?? $leg->expected_arrival_at?->toIso8601String(),
+                ];
+            });
+        })->filter(function ($segment) {
+            return is_numeric($segment['originLat']) && is_numeric($segment['originLng'])
+                && is_numeric($segment['destinationLat']) && is_numeric($segment['destinationLng']);
+        })->take(150)->values();
+
+        // Active Multimodal Shipments must have at least two DISTINCT transport modes.
+        // Two legs using the same mode (e.g. SEA + SEA) are not multimodal.
+        $activeMultimodal = $legShipments->filter(function ($shipment) {
+            return $shipment->legs
+                ->pluck('transport_mode')
+                ->map(fn ($mode) => strtoupper(trim((string) $mode)))
+                ->filter()
+                ->unique()
+                ->count() > 1;
+        })->take(5)->values();
+
         // Statistik keterlambatan per carrier untuk grafik dashboard.
         $carrierShipments = (clone $query)
             ->with('carrier')
@@ -143,7 +207,12 @@ class DashboardController extends Controller
             'mapPoints',
             'carrierDelayStats',
             'etaShipments',
-            'notifications'
+            'notifications',
+            'internationalCount',
+            'multimodalCount',
+            'modeCounts',
+            'multimodalSegments',
+            'activeMultimodal'
         ));
     }
 
