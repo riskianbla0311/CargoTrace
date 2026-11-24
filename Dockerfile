@@ -9,8 +9,8 @@
 # ---------- Tahap 1: build aset front-end ----------
 FROM node:22-alpine AS assets
 WORKDIR /app
-COPY package.json package-lock.json ./
-RUN npm ci
+COPY package*.json ./
+RUN if [ -f package-lock.json ]; then npm ci; else npm install; fi
 COPY . .
 RUN npm run build
 
@@ -31,7 +31,7 @@ RUN sed -ri -e 's!/var/www/html!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/sites-av
 COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 
 WORKDIR /var/www/html
-COPY composer.json composer.lock ./
+COPY composer.json composer.lock* ./
 # Paket dev (Faker) SENGAJA ikut dipasang: seeder data demo memakai factory yang butuh fake().
 RUN composer install --no-interaction --no-progress --no-scripts --no-autoloader --prefer-dist
 
