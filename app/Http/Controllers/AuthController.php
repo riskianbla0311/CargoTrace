@@ -7,15 +7,48 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\ValidationException;
 use Illuminate\Support\Facades\Password;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Auth\Events\PasswordReset;
 use Illuminate\Support\Str;
 
 class AuthController extends Controller
 {
-    public function showLogin()
-    {
-        return view('auth.login');
+   public function login(Request $request)
+{
+    $credentials = $request->validate([
+        'email' => ['required', 'email'],
+        'password' => ['required', 'string'],
+    ]);
+
+    Log::info('CargoTrace login: attempt started', [
+        'session_driver' => config('session.driver'),
+        'database_connection' => config('database.default'),
+    ]);
+
+    $loginSuccess = Auth::attempt(
+        $credentials,
+        $request->boolean('remember')
+    );
+
+    Log::info('CargoTrace login: attempt result', [
+        'success' => $loginSuccess,
+    ]);
+
+    if (!$loginSuccess) {
+        throw ValidationException::withMessages([
+            'email' => 'Email atau password tidak sesuai.',
+        ]);
     }
+
+    $request->session()->regenerate();
+
+    Log::info('CargoTrace login: session regenerated', [
+        'authenticated' => Auth::check(),
+        'user_id' => Auth::id(),
+    ]);
+
+    return redirect()->intended(route('dashboard'));
+}
 
     public function showRegister()
     {
@@ -95,23 +128,7 @@ class AuthController extends Controller
             ->with('success', 'Akun Customer berhasil dibuat. Selamat datang di CargoTrace!');
     }
 
-    public function login(Request $request)
-    {
-        $credentials = $request->validate([
-            'email' => ['required', 'email'],
-            'password' => ['required', 'string'],
-        ]);
-
-        if (!Auth::attempt($credentials, $request->boolean('remember'))) {
-            throw ValidationException::withMessages([
-                'email' => 'Email atau password tidak sesuai.',
-            ]);
-        }
-
-        $request->session()->regenerate();
-
-        return redirect()->intended(route('dashboard'));
-    }
+    
 
     public function logout(Request $request)
     {
