@@ -38,6 +38,16 @@ Route::middleware('auth')->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])
         ->name('dashboard');
 
+    Route::get('/test-auth', function () {
+    return response()->json([
+        'authenticated' => auth()->check(),
+        'user_id' => auth()->id(),
+        'email' => auth()->user()?->email,
+        'role' => auth()->user()?->role,
+        'session_id' => session()->getId(),
+    ]);
+});
+
     // SHIPMENTS
     Route::get('/shipments', [ShipmentController::class, 'index'])
         ->name('shipments.index');
